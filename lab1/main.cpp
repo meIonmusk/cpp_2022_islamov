@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include <fstream>
 //#include <random>
 
 //std::default_random_engine rnd_eng(56);
@@ -73,7 +74,7 @@ bool chek(int** m, int n){
     return flag;
 }
 
-int game(int p, int count) {
+void game(int p, int count) {
     unsigned steps = 0;
 //    int p = 5;
     int n = p + 2;
@@ -94,13 +95,14 @@ int game(int p, int count) {
 //        }
         m[pos[2*i]][pos[2*i+1]] = 1;
     }
+    ofstream fout("task1_stat", ios_base::app);
     field(m, n, pos, count);
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++)
-            std::cout << m[i][j] << " ";
-        std::cout << "\n";
+            fout << m[i][j] << " ";
+        fout << "\n";
     }
-    std::cout << "\n";
+    fout << "\n";
     while (chek(m, n)){
         move(m, n, pos, count);
         steps++;
@@ -110,16 +112,16 @@ int game(int p, int count) {
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++)
-            std::cout << m[i][j] << " ";
-        std::cout << "\n";
+            fout << m[i][j] << " ";
+        fout << "\n";
     }
 
     for (int i = 0; i < n; i++)
         delete[] m[i];
     delete [] m;
     delete [] pos;
-    std::cout << steps;
-    return 0;
+    fout << steps << "\n\n";
+    fout.close();
 }
 
 int main(){
