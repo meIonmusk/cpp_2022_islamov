@@ -1,135 +1,280 @@
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
-//#include <random>
-
-//std::default_random_engine rnd_eng(56);
-//std::uniform_real_distribution<double> dstr(1.0,4.0);
-
-//bool maybe(double prob){
-//    return dstr(rnd_eng) <= prob;
-//}
+#include <random>
+#include <chrono>
 
 using namespace std;
-/* 1. квадрат с 1 дислокацией. Вывести график времени установления от размера поля.
- * 2. квадрат с n дислокациями. Вывести зависимость времени установления от соотношения размера поля и кол-ва дислокаций.
- * 3. проверка одномерного случая.*/
 
-void field(int** m, int n, int const* pos, int count) {
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++)
-            m[i][j] = 0;
+class Game{
+private:
+    void move(){
+        for (int i = 0; i < count; i++) {
+            auto y = positions[2 * i];
+            auto x = positions[2 * i + 1];
 
-    for (int i = 0; i < n; i++){
-        m[0][i] = 2;
-        m[n-1][i] = 2;
-        m[i][0] = 2;
-        m[i][n-1] = 2;
-    }
-    for (int i = 0; i < count; i++)
-        m[pos[2*i]] [pos[2*i+1]] = 1;
-}
+            if (field[y][x] + field[y + 1][x] + field[y][x + 1] + field[y - 1][x] + field[y][x - 1] > 1)
+                field[y][x] = 2;
+        }
 
-void move(int** m, int n, int* pos, int count){
-    for (int i = 0; i < count; i++)
-        if (m[pos[2*i]][pos[2*i+1]]+m[pos[2*i]+1][pos[2*i+1]]+m[pos[2*i]][pos[2*i+1]+1]+m[pos[2*i]-1][pos[2*i+1]]+m[pos[2*i]][pos[2*i+1]-1] > 1)
-            m[pos[2*i]][pos[2*i+1]] = 2;
-    int step[2] = {-1, 1};
-    for (int i = 0; i < count; i++) {
-        if (m[pos[2*i]][pos[2*i+1]] != 2) {
-            int p1 = rand() % 3 - 1;
-            int p2 = rand() % 2;
-            int p_1 = pos[2*i] + p1;
-            int p_2 = pos[2*i+1] + (1-abs(p1))*step[p2];
-//            pos[2*i] += p1;
-//            pos[2*i+1] += (1-abs(p1))*step[p2];
-            if (m[p_1][p_2]){
-                m[pos[2*i]][pos[2*i+1]] = 2;
-                m[p_1][p_2] = 2;
-            }
-            else{
-                pos[2*i] = p_1;
-                pos[2*i+1] = p_2;
+        int step[2] = {-1, 1};
+        for (int i = 0; i < count; i++) {
+            auto y = positions[2 * i];
+            auto x = positions[2 * i + 1];
+            if (field[y][x] != 2) {
+                int dy = rand(-1, 1, rnd_eng);
+                int dx = rand(0, 1, rnd_eng);
+                int y_1 = y + dy;
+                int x_1 = x + (1-abs(dy))*step[dx];
+
+                if (field[y_1][x_1]){
+                    field[y][x] = 2;
+                    field[y_1][x_1] = 2;
+                }
+                else{
+                    positions[2*i] = y_1;
+                    positions[2*i+1] = x_1;
+                }
             }
         }
-    }
-    field(m, n, pos, count);
-    for (int i = 0; i < count; i++)
-        if (m[pos[2*i]][pos[2*i+1]]+m[pos[2*i]+1][pos[2*i+1]]+m[pos[2*i]][pos[2*i+1]+1]+m[pos[2*i]-1][pos[2*i+1]]+m[pos[2*i]][pos[2*i+1]-1] > 1)
-            m[pos[2*i]][pos[2*i+1]] = 2;
-}
 
-bool chek(int** m, int n){
-    bool flag = false;
-    for (int i = 1; i < n-1; i++) {
-        for (int j = 1; j < n-1; j++){
-            if (m[i][j] == 1) {
-                flag = true;
+        update_field();
+
+        for (int i = 0; i < count; i++) {
+            auto y = positions[2 * i];
+            auto x = positions[2 * i + 1];
+
+            if (field[y][x] + field[y + 1][x] + field[y][x + 1] + field[y - 1][x] + field[y][x - 1] > 1)
+                field[y][x] = 2;
+        }
+    }
+
+protected:
+    int n;
+    int m;
+    int count;
+    int** field;
+    int* positions;
+    long long seed;
+    std::default_random_engine rnd_eng;
+
+
+    static long long set_seed(){
+        auto current_time =
+                std::chrono::system_clock::now().time_since_epoch();
+        return
+                std::chrono::duration_cast<std::chrono::seconds>(current_time).count();
+    }
+
+    static int rand(int a, int b, std::default_random_engine &rnd_eng){
+        std::uniform_int_distribution<int> dstr(a, b);
+        return dstr(rnd_eng);
+    }
+
+    void set_field(){
+        auto sizey = n + 2;
+        auto sizex = m + 2;
+        for (int i = 0; i < sizey; i++)
+            for (int j = 0; j < sizex; j++)
+                field[i][j] = 0;
+
+        for (int i = 0; i < sizex; i++) {
+            field[0][i] = 2;
+            field[sizex - 1][i] = 2;
+        }
+        for (int i = 0; i < sizey; i++){
+            field[i][0] = 2;
+            field[i][sizey - 1] = 2;
+        }
+    }
+
+    void update_field(){
+        for (int i = 1; i < n+1; i++)
+            for (int j = 1; j < m+1; j++){
+                if (field[i][j] != 2)
+                    field[i][j] = 0;
+            }
+        for (int i = 0; i < count; i++){
+            if (field[positions[2*i]] [positions[2*i+1]] != 2)
+                field[positions[2*i]] [positions[2*i+1]] = 1;
+        }
+    }
+
+    void set_dislocations(){
+        for (int i = 0; i < count; i++) {
+            do {
+                positions[2*i] = rand(1, n-1, rnd_eng);
+                positions[2*i+1] = rand(1, m-1, rnd_eng);
+            } while (field[positions[2*i]][positions[2*i+1]]);
+
+            field[positions[2*i]][positions[2*i+1]] = 1;
+        }
+        for (int i = 0; i < 2*count; i++)
+            cout << positions[i];
+        cout << "\n";
+        for (int i = 0; i < n+2; i++){
+            for (int j = 0; j < m+2; j++){
+                cout << field[i][j];
+            }
+            cout << "\n";
+        }
+        cout << "\n";
+    }
+
+    bool check(){
+        bool flag = false;
+        for (int i = 1; i < n+2; i++) {
+            for (int j = 1; j < n+2; j++){
+                if (field[i][j] == 1) {
+                    flag = true;
+                    break;
+                }
+            }
+            if (flag)
                 break;
+        }
+        return flag;
+    }
+
+public:
+    Game(int n_, int m_, int count_){
+        if (count_ > n_ * m_)
+            count_ = n_ * m_;
+        n = n_;
+        m = m_;
+        count = count_;
+        seed = set_seed();
+        std::default_random_engine rnd_eng_(seed);
+        rnd_eng = rnd_eng_;
+        field = new int *[n+2];
+        for (int i = 0; i < n+2; i++)
+            field[i] = new int [m+2];
+        positions = new int [2*count];
+        set_field();
+        set_dislocations();
+    }
+
+    long long start(){
+        long long steps = 0;
+        while (check()){
+            move();
+            steps++;
+            if (steps > 100000)
+                break;
+        }
+        for (int i = 0; i < n+2; i++){
+            for (int j = 0; j < m+2; j++){
+                cout << field[i][j];
+            }
+            cout << "\n";
+        }
+        cout << "\n";
+        return steps;
+    }
+
+    long long get_seed() const{
+        return seed;
+    }
+
+    ~Game(){
+        for (int i = 0; i < n+2; i++)
+            delete[] field[i];
+        delete [] field;
+        delete [] positions;
+    }
+};
+
+class LineGame: public Game
+{
+protected:
+    void move(){
+        for (int i = 0; i < count; i++) {
+            auto y = positions[2 * i];
+            auto x = positions[2 * i + 1];
+
+            if (field[y][x] + field[y][x + 1] + field[y][x - 1] > 1)
+                field[y][x] = 2;
+        }
+
+        int step[2] = {-1, 1};
+        for (int i = 0; i < count; i++) {
+            auto y = positions[2 * i];
+            auto x = positions[2 * i + 1];
+            if (field[y][x] != 2) {
+                int dx = rand(0, 1, rnd_eng);
+                int x_1 = x + step[dx];
+
+                if (field[y][x_1]){
+                    field[y][x] = 2;
+                    field[y][x_1] = 2;
+                }
+                else
+                    positions[2*i+1] = x_1;
             }
         }
-        if (flag)
-            break;
+
+        set_field();
+
+        for (int i = 0; i < count; i++) {
+            auto y = positions[2 * i];
+            auto x = positions[2 * i + 1];
+
+            if (field[y][x] + field[y][x + 1] + field[y][x - 1] > 1)
+                field[y][x] = 2;
+        }
     }
-    return flag;
+
+public:
+    LineGame(int m_, int count_)
+        : Game(1, m_, count_)
+        {
+        }
+};
+
+void task1(){
+    for (int i = 2; i < 10; i++) {
+//        auto current_time =
+//                std::chrono::system_clock::now().time_since_epoch();
+//        auto seed =
+//                std::chrono::duration_cast<std::chrono::seconds>(current_time).count();
+//        std::default_random_engine rnd_eng(seed);
+
+        Game a{i, i, 1};
+        ofstream file_out("task1_stat", ios_base::app);
+
+        file_out << "seed: " << a.get_seed() << "; size_of_field: " << i << "x" << i << "; num_of_dislocations: " << 1 << "; steps: " << a.start() << "\n";
+        file_out.close();
+    }
 }
 
-void game(int p, int count) {
-    unsigned steps = 0;
-//    int p = 5;
-    int n = p + 2;
-//    int count = 2;
-    int** m = new int *[n];
-    for (int i = 0; i < n; i++)
-        m[i] = new int [n];
+void task3(){
+    for (int i = 2; i < 10; i++) {
+        LineGame a{ i, 1};
+        ofstream file_out("task3_stat", ios_base::app);
 
-    int* pos = new int [count];
-    for (int i = 0; i < count; i++) {
-        do {
-            pos[2 * i] = rand() % p + 1;
-            pos[2 * i + 1] = rand() % p + 1;
-        } while (m[pos[2*i]][pos[2*i+1]]);
-//        while (m[pos[2*i]][pos[2*i+1]]) {
-//            pos[2 * i] = rand() % p + 1;
-//            pos[2 * i + 1] = rand() % p + 1;
-//        }
-        m[pos[2*i]][pos[2*i+1]] = 1;
+        file_out << "seed: " << a.get_seed() << "; size_of_field: " << i << "x" << i << "; num_of_dislocations: " << 1 << "; steps: " << a.start() << "\n";
+        file_out.close();
     }
-    ofstream fout("task1_stat", ios_base::app);
-    field(m, n, pos, count);
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++)
-            fout << m[i][j] << " ";
-        fout << "\n";
-    }
-    fout << "\n";
-    while (chek(m, n)){
-        move(m, n, pos, count);
-        steps++;
-        if (steps > 10000)
-            break;
-    }
-
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++)
-            fout << m[i][j] << " ";
-        fout << "\n";
-    }
-
-    for (int i = 0; i < n; i++)
-        delete[] m[i];
-    delete [] m;
-    delete [] pos;
-    fout << steps << "\n\n";
-    fout.close();
 }
 
+//
+//int rand(std::default_random_engine &rnd_eng,
+//         std::uniform_int_distribution<int> &dstr){
+//    return dstr(rnd_eng);
+//}
 int main(){
-    auto seed = time(nullptr);
-    srand(seed);
-    int p = 5;
-    int count = 2;
-    for (int i = 0; i < 5; i++)
-        game(p, count);
+    task3();
+//    auto current_time =
+//            std::chrono::system_clock::now().time_since_epoch();
+//    auto seed =
+//            std::chrono::duration_cast<std::chrono::seconds>(current_time).count();
+//    std::default_random_engine rnd_eng(seed);
+//
+//
+//    for (int i = 0; i < 10; i++){
+//        std::uniform_int_distribution<int> dstr(1, 10);
+//        cout << rand(rnd_eng, dstr);}
+////        cout << dstr(rnd_eng);}
+
     return 0;
 }
