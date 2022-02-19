@@ -101,3 +101,11 @@ seed: 1645279261; size_of_field: 5x5; num_of_dislocations: 1; steps: 1
 seed: 1645279261; size_of_field: 6x6; num_of_dislocations: 1; steps: 1
 seed: 1645279261; size_of_field: 7x7; num_of_dislocations: 1; steps: 1
 seed: 1645279261; size_of_field: 8x8; num_of_dislocations: 1; steps: 1
+seed: 1645310075; size_of_field: 2x2; num_of_dislocations: 1; steps: 0
+seed: 1645310075; size_of_field: 3x3; num_of_dislocations: 1; steps: 0
+seed: 1645310075; size_of_field: 4x4; num_of_dislocations: 1; steps: 0
+seed: 1645310075; size_of_field: 5x5; num_of_dislocations: 1; steps: 1
+seed: 1645310075; size_of_field: 6x6; num_of_dislocations: 1; steps: 0
+seed: 1645310075; size_of_field: 7x7; num_of_dislocations: 1; steps: 1
+seed: 1645310075; size_of_field: 8x8; num_of_dislocations: 1; steps: 0
+seed: 1645310075; size_of_field: 9x9; num_of_dislocations: 1; steps: 2

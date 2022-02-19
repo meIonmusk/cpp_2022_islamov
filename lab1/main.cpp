@@ -155,12 +155,12 @@ public:
     }
 
     long long start(){
-        long long steps = 0;
+        long long steps = -1;
         while (check()){
             move();
-            steps++;
             if (steps > 100000)
                 break;
+            steps++;
         }
         for (int i = 0; i < n+2; i++){
             for (int j = 0; j < m+2; j++){
@@ -263,7 +263,7 @@ void task3(){
 //    return dstr(rnd_eng);
 //}
 int main(){
-    task3();
+    task1();
 //    auto current_time =
 //            std::chrono::system_clock::now().time_since_epoch();
 //    auto seed =
