@@ -78,7 +78,6 @@ protected:
             field[0][i] = 2;
             field[sizey - 1][i] = 2;
         }
-
     }
 
     void show_field(){
@@ -231,7 +230,7 @@ public:
 };
 
 void task1(){
-    for (int i = 2; i < 1002; i+=25) {
+    for (int i = 2; i < 500; i+=25) {
         Game a{i, i, 1};
         ofstream file_out("task1_stat", ios_base::app);
 
@@ -242,7 +241,7 @@ void task1(){
 }
 
 void task2() {
-    for (int i = 2; i < 1002; i+=10) {
+    for (int i = 2; i < 500; i+=10) {
         auto max = (i/5 > 1)? i/5 : 1;
         for (int count = 1; count < i; count+=max){
             Game a{i, i, count};
@@ -257,19 +256,20 @@ void task2() {
 }
 
 void task3(){
-    for (int i = 2; i < 2102; i+=50) {
-        LineGame a{ i, 1};
-        ofstream file_out("task3_stat", ios_base::app);
+    for (int i = 2; i < 3000; i+=50) {
+        auto max = (i/10 > 1)? i/10 : 1;
+        for (int j = 1; j < i; j += max){
+            LineGame a{i , j};
+            ofstream file_out("task3_stat_2", ios_base::app);
 
-        file_out << "seed: " << a.get_seed() << "; size_of_field: " << a.get_n() << "x" << a.get_m()
-                 << "; num_of_dislocations: " << a.get_count() << "; steps: " << a.start() << "\n";
-        file_out.close();
+            file_out << "seed: " << a.get_seed() << "; size_of_field: " << a.get_n() << "x" << a.get_m()
+                     << "; num_of_dislocations: " << a.get_count() << "; steps: " << a.start() << "\n";
+            file_out.close();
+        }
     }
 }
 
 int main(){
-    task2();
-    task1();
     task3();
     return 0;
 }

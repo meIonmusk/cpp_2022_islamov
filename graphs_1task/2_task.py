@@ -17,7 +17,8 @@ def sep_indexes(lst):
     indexes.append(len(lst))
     return indexes
 
-directory = '/Users/sardorislamov/Desktop/cpp_2022_islamov/lab1/cmake-build-debug/task2_stat'
+# directory = '/Users/sardorislamov/Desktop/cpp_2022_islamov/lab1/cmake-build-debug/task2_stat' # width = 5000
+directory = '/Users/sardorislamov/Desktop/cpp_2022_islamov/lab1/cmake-build-debug/task3_stat_2' # width = 12
 
 with open(directory, 'r') as file:
     sizey = [int(line.rstrip().split()[3].split('x')[0]) for line in file.readlines()]
@@ -45,7 +46,7 @@ for i in ratio:
     max_x.append(max(i))
 for i in range(len(steps)):
     max_y.append(max(steps[i]))
-    ax.bar(ratio[i], steps[i], width=5000, align='center', alpha=0.4)
+    ax.bar(ratio[i], steps[i], width=12, align='center', alpha=0.4)
 
 maxx = max(max_x)
 maxy = max(max_y)

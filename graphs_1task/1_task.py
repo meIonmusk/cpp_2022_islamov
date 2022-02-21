@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
 
 
 def separate(lst, indexes):
@@ -17,8 +16,8 @@ def sep_indexes(lst):
     indexes.append(len(lst))
     return indexes
 
-
 directory = '/Users/sardorislamov/Desktop/cpp_2022_islamov/lab1/cmake-build-debug/task1_stat'
+# directory = '/Users/sardorislamov/Desktop/cpp_2022_islamov/lab1/cmake-build-debug/task3_stat'
 
 with open(directory, 'r') as file:
     size = [int(line.rstrip().split()[3].split('x')[1][:-1]) for line in file.readlines()]
@@ -43,8 +42,6 @@ for i in range(len(steps)):
     ax.plot(size[i], steps[i])
 maxx = max(max_x)
 maxy = max(max_y)
-ax.yaxis.set_major_locator(ticker.MultipleLocator(maxy//5))
-ax.xaxis.set_major_locator(ticker.MultipleLocator(maxx//5))
 plt.xlim(0, 1.05*maxx)
 plt.ylim(0, 1.05*maxy)
 plt.xlabel('Field size')
