@@ -2,6 +2,13 @@
 #include <iomanip>
 #include <cmath>
 
+double float_sum(float const psi[], float const pdf[], float const dv, unsigned size){
+    float sum = 0.f;
+    for (unsigned idx = 0; idx < size; idx++)
+        sum += psi[idx] * pdf[idx];
+    return sum * dv;
+}
+
 float recurrent_sum(float const psi[], float const pdf[], float const dv, unsigned ldx, unsigned rdx){
     auto ldx_ = ldx + (rdx - ldx) / 2;
     return (rdx - ldx)?
@@ -43,7 +50,7 @@ double double_sum(float const psi[], float const pdf[], float const dv, unsigned
 
 
 int main() {
-    unsigned const n = 20480;
+    unsigned const n = 10000;
     float const pif = 3.1415926535f;
     float const T = 0.1f;
     float const pdf_coeff = std::sqrt(1.f / (T * pif));
@@ -57,6 +64,7 @@ int main() {
         pdf[idx] = pdf_coeff * std::exp(-psi[idx] * psi[idx]);
     }
     std::cout << std::setprecision(10) << std::fixed;
+    std::cout << "float sum\n" << float_sum(psi, pdf, dv, n) << '\n';
     std::cout << "recurrent sum\n" << recurrent_sum(psi, pdf, dv, 0, n-1) << '\n';
     std::cout << "forward kahan sum\n" << forward_kahan_sum(psi, pdf, dv, n) << '\n';
     std::cout << "forward kahan sum with fma using\n" << forward_kahan_sum_fma(psi, pdf, dv, n) << '\n';
