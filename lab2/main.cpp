@@ -17,17 +17,29 @@ float recurrent_sum(float const psi[], float const pdf[], float const dv, unsign
 }
 
 float near_sum(float const psi[], float const pdf[], float const dv, unsigned size){
-    unsigned const size_ = (size + 1) / 2;
+    unsigned const size_ = (size - 1) / 2 + 1;
     float psi_[size_];
     float pdf_[size_];
-    for (unsigned idx = 0; 2 * idx < size; idx++){
-        ((2 * idx + 1) < size)?
-        psi_[idx] = fma(psi[2 * idx], pdf[2 * idx], fma(psi[2 * idx + 1], pdf[2 * idx + 1], 0.f)) :
-        psi_[idx] = fma(psi[2 * idx], pdf[2 * idx], 0.f);
-        pdf_[idx] = 1.f;
-    }
+    if (pdf[0] >= 0)
+        for (unsigned idx = 0; 2 * idx < size; idx++)
+            ((2 * idx + 1) < size) ?
+            psi_[idx] = psi[2 * idx] * pdf[2 * idx] + psi[2 * idx + 1] * pdf[2 * idx + 1] :
+                    psi_[idx] = psi[2 * idx] * pdf[2 * idx];
+
+//                    psi_[idx] = fma(psi[2 * idx], pdf[2 * idx],
+//                                    fma(psi[2 * idx + 1], pdf[2 * idx + 1], 0.f)) :
+//                    psi_[idx] = fma(psi[2 * idx], pdf[2 * idx], 0.f);
+    else
+        for (unsigned idx = 0; 2 * idx < size; idx++)
+            ((2 * idx + 1) < size) ?
+            psi_[idx] = psi[2 * idx] + psi[2 * idx + 1] :
+                    psi_[idx] = psi[2 * idx];
+
+    pdf_[0] = -1.f;
     return (size == 1)?
+    (pdf[0] > 0)?
     2 * dv * psi[0] * pdf[0] :
+    2 * dv * psi[0] :
     near_sum(psi_, pdf_, dv, size_);
 }
 
