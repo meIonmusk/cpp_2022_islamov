@@ -16,31 +16,21 @@ float recurrent_sum(float const psi[], float const pdf[], float const dv, unsign
            2 * dv * psi[ldx] * pdf[rdx];
 }
 
+float near_sum_one(float psi[], float dv, unsigned size, unsigned dx){
+    for (unsigned idx = 0; idx < size; idx += 2 * dx)
+        if (idx + dx < size)
+            psi[idx] += psi[idx + dx];
+
+    return (2 * dx + 2 < size) ?
+           near_sum_one(psi, dv, size, dx * 2):
+           dv * psi[0];
+}
+
 float near_sum(float const psi[], float const pdf[], float const dv, unsigned size){
-    unsigned const size_ = (size - 1) / 2 + 1;
-    float psi_[size_];
-    float pdf_[size_];
-    if (pdf[0] >= 0)
-        for (unsigned idx = 0; 2 * idx < size; idx++)
-            ((2 * idx + 1) < size) ?
-            psi_[idx] = psi[2 * idx] * pdf[2 * idx] + psi[2 * idx + 1] * pdf[2 * idx + 1] :
-                    psi_[idx] = psi[2 * idx] * pdf[2 * idx];
-
-//                    psi_[idx] = fma(psi[2 * idx], pdf[2 * idx],
-//                                    fma(psi[2 * idx + 1], pdf[2 * idx + 1], 0.f)) :
-//                    psi_[idx] = fma(psi[2 * idx], pdf[2 * idx], 0.f);
-    else
-        for (unsigned idx = 0; 2 * idx < size; idx++)
-            ((2 * idx + 1) < size) ?
-            psi_[idx] = psi[2 * idx] + psi[2 * idx + 1] :
-                    psi_[idx] = psi[2 * idx];
-
-    pdf_[0] = -1.f;
-    return (size == 1)?
-    (pdf[0] > 0)?
-    2 * dv * psi[0] * pdf[0] :
-    2 * dv * psi[0] :
-    near_sum(psi_, pdf_, dv, size_);
+    float psi_[size];
+    for (unsigned idx = 0; idx < size; idx++)
+        psi_[idx] = psi[idx] * pdf[idx];
+    return 2 * near_sum_one(psi_, dv, size, 1);
 }
 
 float forward_kahan_sum(float const psi[], float const pdf[], float const dv, unsigned size){
