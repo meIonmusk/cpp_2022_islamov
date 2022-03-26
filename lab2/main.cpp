@@ -1,8 +1,12 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
+#include <fstream>
+#include <cstdlib>
 
-double float_sum(float const psi[], float const pdf[], float const dv, unsigned size){
+using namespace std;
+
+float float_sum(float const psi[], float const pdf[], float const dv, unsigned size){
     float sum = 0.f;
     for (unsigned idx = 0; idx < size; idx++)
         sum += psi[idx] * pdf[idx];
@@ -64,11 +68,39 @@ double double_sum(float const psi[], float const pdf[], float const dv, unsigned
     return 2 * sum * static_cast<double>(dv);
 }
 
+void fout(std::string file_name, unsigned const n, float const T, float value, double mvc){
+    std::ofstream file_out(file_name, ios_base::app);
+    file_out << std::setprecision(2) << "segmentation = " << 2 * n << " temperature = " << T;
+    file_out << std::setprecision(10) << " value = " << value << " differ = " << mvc - value << '\n';
+    file_out.close();
+}
+
+void fout(std::string file_name, unsigned const n, float const T, double value, double mvc){
+    std::ofstream file_out(file_name, ios_base::app);
+    file_out << std::setprecision(2) << "segmentation = " << 2 * n << " temperature = " << T;
+    file_out << std::setprecision(10) << " value = " << value << " differ = " << mvc - value << '\n';
+    file_out.close();
+}
+
+void fclear(std::string file_name){
+    std::ofstream file( file_name, std::ios::out);
+    file.close();
+}
+
+void fclear_all(){
+    fclear("float_sum");
+    fclear("recurrent_sum");
+    fclear("sum_with_near_numbers");
+    fclear("forward_kahan_sum");
+    fclear("forward_kahan_sum_with_using_fma");
+    fclear("standard_sum_in_double_type");
+}
 
 int main() {
-    unsigned const n = 20480;
+    unsigned const n = 4385;
     float const pif = 3.1415926535f;
-    float const T = 0.1f;
+    double const pi = 3.1415926535;
+    float const T = 100.f;
     float const pdf_coeff = std::sqrt(1.f / (T * pif));
     float psi[n] = {0}, pdf[n] = {0};
 
@@ -78,14 +110,17 @@ int main() {
         psi[idx] = v;
         pdf[idx] = pdf_coeff * std::exp(-psi[idx] * psi[idx] / T);
     }
-    std::cout << std::setprecision(10) << std::fixed;
-    std::cout << "float sum\n" << float_sum(psi, pdf, dv, n) << '\n';
-    std::cout << "recurrent sum\n" << recurrent_sum(psi, pdf, dv, 0, n-1) << '\n';
-    std::cout << "sum with near numbers\n" << near_sum(psi, pdf, dv, n) << '\n';
-    std::cout << "forward kahan sum\n" << forward_kahan_sum(psi, pdf, dv, n) << '\n';
-    std::cout << "forward kahan sum with using fma\n" << forward_kahan_sum_fma(psi, pdf, dv, n) << '\n';
-    std::cout << "standard sum in double type\n" << double_sum(psi, pdf, dv, n) << '\n';
-    std::cout << "mean velocity value\n" << std::sqrt(T / pif);
+
+    double mvc = std::sqrt(T / pi);
+
+    fout("float_sum", n, T, float_sum(psi, pdf, dv, n), mvc);
+    fout("recurrent_sum", n, T, recurrent_sum(psi, pdf, dv, 0, n-1), mvc);
+    fout("sum_with_near_numbers", n, T, near_sum(psi, pdf, dv, n), mvc);
+    fout("forward_kahan_sum", n, T, forward_kahan_sum(psi, pdf, dv, n), mvc);
+    fout("forward_kahan_sum_with_using_fma", n, T, forward_kahan_sum_fma(psi, pdf, dv, n), mvc);
+    fout("standard_sum_in_double_type", n, T, double_sum(psi, pdf, dv, n), mvc);
+
+//    fclear_all();
 
     return 0;
 }
