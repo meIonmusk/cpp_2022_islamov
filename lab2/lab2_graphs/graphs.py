@@ -4,8 +4,10 @@ import numpy as np
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
+# file_names = ['float_sum', 'sum_with_near_numbers', 'forward_kahan_sum',
+#               'forward_kahan_sum_with_using_fma', 'standard_sum_in_double_type', 'recurrent_sum']
 file_names = ['float_sum', 'sum_with_near_numbers', 'forward_kahan_sum',
-              'forward_kahan_sum_with_using_fma', 'standard_sum_in_double_type', 'recurrent_sum']
+              'forward_kahan_sum_with_using_fma', 'standard_sum_in_double_type']
 
 directory = '/Users/sardorislamov/Desktop/cpp_2022_islamov/lab2/cmake-build-debug/'
 
@@ -39,6 +41,7 @@ def graphs(ax, directory, T):
     error_values = [error_values[i] for i in arg_sort]
 
     ax.plot(segmentations, error_values, label=directory[69:].replace('_', ' '))
+    # ax.scatter(segmentations, error_values, s=2, label=directory[69:].replace('_', ' '))
     # print(temperatures)
     # print(error_values)
     # print(segmentations)

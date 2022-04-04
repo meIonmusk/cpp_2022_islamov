@@ -18,6 +18,7 @@ def sep_indexes(lst):
     return indexes
 
 # directory = '/Users/sardorislamov/Desktop/cpp_2022_islamov/lab1/cmake-build-debug/task2_stat' # width = 5000
+# directory = '/Users/sardorislamov/Desktop/cpp_2022_islamov/lab1/2 task duple'
 directory = '/Users/sardorislamov/Desktop/cpp_2022_islamov/lab1/cmake-build-debug/task3_stat_2' # width = 12
 
 with open(directory, 'r') as file:

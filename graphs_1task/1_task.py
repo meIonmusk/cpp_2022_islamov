@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-
+import numpy as np
 
 def separate(lst, indexes):
     a = []
@@ -16,7 +16,8 @@ def sep_indexes(lst):
     indexes.append(len(lst))
     return indexes
 
-directory = '/Users/sardorislamov/Desktop/cpp_2022_islamov/lab1/cmake-build-debug/task1_stat'
+# directory = '/Users/sardorislamov/Desktop/cpp_2022_islamov/lab1/cmake-build-debug/task1_stat'
+directory = '/Users/sardorislamov/Desktop/cpp_2022_islamov/lab1/task1_stat_duble'
 # directory = '/Users/sardorislamov/Desktop/cpp_2022_islamov/lab1/cmake-build-debug/task3_stat'
 
 with open(directory, 'r') as file:
@@ -35,9 +36,11 @@ ax = fig.add_subplot(111)
 
 max_y = [0]
 max_x = [0]
-for i in size:
-    max_x.append(max(i))
+for i in range(len(size)):
+    # size[i] = np.log(size[i])
+    max_x.append(max(size[i]))
 for i in range(len(steps)):
+    # steps[i] = np.log(steps[i])
     max_y.append(max(steps[i]))
     ax.plot(size[i], steps[i])
 maxx = max(max_x)

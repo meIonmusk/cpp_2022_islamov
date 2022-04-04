@@ -26,17 +26,34 @@ protected:
                 field[y][x] = 2;
         }
 
-        int step[2] = {-1, 1};
         for (int i = 0; i < count; i++) {
             auto y = positions[2 * i];
             auto x = positions[2 * i + 1];
+            int dx = 0;
+            int dy = 0;
             if (field[y][x] != 2) {
-                int dy = rand(-1, 1, rnd_eng);
-                int dx = rand(0, 1, rnd_eng);
-                int y_1 = y + dy;
-                int x_1 = x + (1-abs(dy))*step[dx];
+                int d = rand(0, 4, rnd_eng);
+                if (d == 0){
+                    dx = 0;
+                    dy = 1;
+                }
+                else if (d == 1){
+                    dx = 1;
+                    dy = 0;
+                }
+                else if (d == 2){
+                    dx = 0;
+                    dy = -1;
+                }
+                else if (d == 3){
+                    dx = -1;
+                    dy = 0;
+                }
 
-                if (field[y_1][x_1]){
+                int y_1 = y + dy;
+                int x_1 = x + dx;
+
+                if (field[y_1][x_1] and (dx or dy)){
                     field[y][x] = 2;
                     field[y_1][x_1] = 2;
                 }
@@ -189,15 +206,14 @@ protected:
                 field[y][x] = 2;
         }
 
-        int step[2] = {-1, 1};
         for (int i = 0; i < count; i++) {
             auto y = positions[2 * i];
             auto x = positions[2 * i + 1];
             if (field[y][x] != 2) {
-                int dx = rand(0, 1, rnd_eng);
-                int x_1 = x + step[dx];
+                int dx = rand(-1, 1, rnd_eng);
+                int x_1 = x + dx;
 
-                if (field[y][x_1]){
+                if (field[y][x_1] and dx){
                     field[y][x] = 2;
                     field[y][x_1] = 2;
                 }
@@ -230,7 +246,7 @@ public:
 };
 
 void task1(){
-    for (int i = 2; i < 500; i+=25) {
+    for (int i = 2; i < 503; i+=50) {
         Game a{i, i, 1};
         ofstream file_out("task1_stat", ios_base::app);
 
@@ -256,16 +272,16 @@ void task2() {
 }
 
 void task3(){
-    for (int i = 2; i < 3000; i+=50) {
-        auto max = (i/10 > 1)? i/10 : 1;
-        for (int j = 1; j < i; j += max){
-            LineGame a{i , j};
-            ofstream file_out("task3_stat_2", ios_base::app);
+    for (int i = 2; i < 1853; i+=50) {
+//        auto max = (i/10 > 1)? i/10 : 1;
+//        for (int j = 1; j < i; j += max){
+            LineGame a{i , 1};
+            ofstream file_out("task3_stat", ios_base::app);
 
             file_out << "seed: " << a.get_seed() << "; size_of_field: " << a.get_n() << "x" << a.get_m()
                      << "; num_of_dislocations: " << a.get_count() << "; steps: " << a.start() << "\n";
             file_out.close();
-        }
+//        }
     }
 }
 

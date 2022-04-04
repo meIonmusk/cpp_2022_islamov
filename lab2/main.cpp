@@ -97,29 +97,35 @@ void fclear_all(){
 }
 
 int main() {
-    unsigned const n = 4385;
+//    unsigned const n = 12750;
     float const pif = 3.1415926535f;
     double const pi = 3.1415926535;
-    float const T = 100.f;
+    float const T = 0.1f;
     float const pdf_coeff = std::sqrt(1.f / (T * pif));
-    float psi[n] = {0}, pdf[n] = {0};
+//    float psi[n] = {0}, pdf[n] = {0};
+    for (unsigned n = 100000; n < 100002; n += 1) {
+        auto *psi = new float[n];
+        auto *pdf = new float[n];
 
-    float const dv = 1.f / 128.f;
-    for (unsigned idx = 0; idx != n; ++idx) {
-        float v = std::fma(dv, static_cast<float>(idx), 0.f);
-        psi[idx] = v;
-        pdf[idx] = pdf_coeff * std::exp(-psi[idx] * psi[idx] / T);
+        float const dv = 1.f / 128.f;
+        for (unsigned idx = 0; idx != n; ++idx) {
+            float v = std::fma(dv, static_cast<float>(idx), 0.f);
+            psi[idx] = v;
+            pdf[idx] = pdf_coeff * std::exp(-psi[idx] * psi[idx] / T);
+        }
+
+        double mvc = std::sqrt(T / pi);
+
+        fout("float_sum", n, T, float_sum(psi, pdf, dv, n), mvc);
+        fout("recurrent_sum", n, T, recurrent_sum(psi, pdf, dv, 0, n - 1), mvc);
+        fout("sum_with_near_numbers", n, T, near_sum(psi, pdf, dv, n), mvc);
+        fout("forward_kahan_sum", n, T, forward_kahan_sum(psi, pdf, dv, n), mvc);
+        fout("forward_kahan_sum_with_using_fma", n, T, forward_kahan_sum_fma(psi, pdf, dv, n), mvc);
+        fout("standard_sum_in_double_type", n, T, double_sum(psi, pdf, dv, n), mvc);
+
+        delete[] psi;
+        delete[] pdf;
     }
-
-    double mvc = std::sqrt(T / pi);
-
-    fout("float_sum", n, T, float_sum(psi, pdf, dv, n), mvc);
-    fout("recurrent_sum", n, T, recurrent_sum(psi, pdf, dv, 0, n-1), mvc);
-    fout("sum_with_near_numbers", n, T, near_sum(psi, pdf, dv, n), mvc);
-    fout("forward_kahan_sum", n, T, forward_kahan_sum(psi, pdf, dv, n), mvc);
-    fout("forward_kahan_sum_with_using_fma", n, T, forward_kahan_sum_fma(psi, pdf, dv, n), mvc);
-    fout("standard_sum_in_double_type", n, T, double_sum(psi, pdf, dv, n), mvc);
-
 //    fclear_all();
 
     return 0;
